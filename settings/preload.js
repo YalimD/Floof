@@ -1,0 +1,26 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('floofSettings', {
+  get: () => ipcRenderer.invoke('settings:get'),
+  update: (patch) => ipcRenderer.invoke('settings:update', patch),
+  newRelayTopic: () => ipcRenderer.invoke('relay:new-topic'),
+  relayStatus: () => ipcRenderer.invoke('relay:status'),
+  relayTest: () => ipcRenderer.invoke('relay:test'),
+  onRelayStatus: (cb) => ipcRenderer.on('relay:status', (_e, s) => cb(s)),
+  listPacks: () => ipcRenderer.invoke('packs:list'),
+  importFolder: () => ipcRenderer.invoke('packs:import-folder'),
+  importStrip: (frames, name) => ipcRenderer.invoke('packs:import-strip', { frames, name }),
+  removePack: (folder) => ipcRenderer.invoke('packs:remove', folder),
+  openSpritesFolder: () => ipcRenderer.invoke('open-sprites-folder'),
+  testEvent: (state) => ipcRenderer.invoke('test-event', state),
+  openApps: () => ipcRenderer.invoke('settings:open-apps'),
+  openWindows: () => ipcRenderer.invoke('settings:open-windows'),
+  listScreens: () => ipcRenderer.invoke('screens:list'),
+  identifyScreens: () => ipcRenderer.invoke('screens:identify'),
+  addBox: () => ipcRenderer.invoke('boxes:add'),
+  startTour: () => ipcRenderer.invoke('tour:start'),
+  pickBoxPicture: (id) => ipcRenderer.invoke('boxes:pick-picture', id),
+  onFocusBox: (cb) => ipcRenderer.on('settings:focus-box', (_e, id) => cb(id)),
+  claudeStatus: () => ipcRenderer.invoke('claude:status'),
+  claudeSet: (opts) => ipcRenderer.invoke('claude:set', opts),
+});

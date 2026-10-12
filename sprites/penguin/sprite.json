@@ -1,0 +1,14 @@
+{
+  "name": "penguin",
+  "sheet": "sheet.png",
+  "frameWidth": 24,
+  "frameHeight": 24,
+  "scale": 4,
+  "facing": "right",
+  "animations": {
+    "idle":  { "row": 0, "frames": 2, "fps": 2 },
+    "walk":  { "row": 1, "frames": 2, "fps": 6 },
+    "sleep": { "row": 2, "frames": 1, "fps": 1 },
+    "wave":  { "row": 3, "frames": 2, "fps": 4 }
+  }
+}

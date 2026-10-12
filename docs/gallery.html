@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'" />
+    <title>floof docs pictures</title>
+    <link rel="stylesheet" href="../renderer/style.css" />
+    <style>
+      html,
+      body {
+        width: auto;
+        height: auto;
+        overflow: visible;
+        background: transparent;
+      }
+      body {
+        margin: 0;
+        font: 600 13px 'Segoe UI', sans-serif;
+        color: #8a7f6e;
+      }
+      .sheet {
+        display: none;
+        padding: 18px 22px 12px;
+        width: max-content;
+      }
+      .row {
+        display: flex;
+        gap: 16px;
+        align-items: flex-end;
+      }
+      .cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+      canvas {
+        image-rendering: pixelated;
+      }
+      .stuck {
+        transform: scaleY(-1);
+      }
+      .taskbar {
+        height: 12px;
+        background: #2f2e2b;
+        border-radius: 3px;
+      }
+      /* the real balloon, curtain and pet box styles, placed in the page instead of on the overlay */
+      .scene {
+        position: relative;
+      }
+      .scene .balloon,
+      .scene .curtain,
+      .scene .petbox {
+        position: absolute;
+        display: block;
+      }
+      .window {
+        position: absolute;
+        background: #f3efe6;
+        border: 1px solid #cfc6b4;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      }
+      .window .titlebar {
+        height: 22px;
+        border-bottom: 1px solid #ddd5c4;
+        border-radius: 8px 8px 0 0;
+        background: #e9e3d6;
+      }
+      .scene canvas {
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- each sheet becomes one picture in docs/images, drawn with floof's own code and styles -->
+    <div class="sheet" id="logo"></div>
+    <div class="sheet" id="critters"></div>
+    <div class="sheet" id="states"></div>
+    <div class="sheet" id="outfits"></div>
+    <div class="sheet" id="plungers"></div>
+    <div class="sheet" id="question"><div class="scene" id="questionScene" style="width: 330px; height: 290px"></div></div>
+    <div class="sheet" id="curtain"><div class="scene" id="curtainScene" style="width: 520px; height: 330px"></div></div>
+    <div class="sheet" id="box"><div class="scene" id="boxScene" style="width: 560px; height: 340px"></div></div>
+    <script src="../renderer/critters.js"></script>
+    <script src="gallery.js"></script>
+  </body>
+</html>

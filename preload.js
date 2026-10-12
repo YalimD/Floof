@@ -1,0 +1,38 @@
+const { contextBridge, ipcRenderer } = require('electron');
+
+const on = (channel) => (cb) => ipcRenderer.on(channel, (_e, payload) => cb(payload));
+
+contextBridge.exposeInMainWorld('floof', {
+  onAgentEvent: on('agent-event'),
+  onSpawn: on('spawn'),
+  onRemovePet: on('remove-pet'),
+  onRemoveCritters: on('remove-critters'),
+  onReloadPacks: on('reload-packs'),
+  onSettings: on('settings'),
+  onWindows: on('windows'),
+  onFocusPet: on('focus-pet'),
+  onDisplays: on('displays'),
+  onAdopt: on('adopt'),
+  onInput: on('input'),
+  onFindPet: on('find-pet'),
+  onAnswered: on('answered'),
+  petsReport: (pets) => ipcRenderer.send('pets-report', pets),
+  tour: (action) => ipcRenderer.send('tour', action),
+  sendAway: (kind) => ipcRenderer.send('send-away', kind),
+  control: (id, kind, text) => ipcRenderer.send('agent-control', { id, kind, text }),
+  goTo: (id) => ipcRenderer.invoke('go-to', id),
+  onControlStatus: on('control-status'),
+  setInteractive: (on) => ipcRenderer.send('set-interactive', on),
+  answer: (id, text) => ipcRenderer.send('answer', { id, text }),
+  handoff: (side, pet) => ipcRenderer.send('handoff', { side, pet }),
+  reroute: (ev) => ipcRenderer.send('reroute', ev),
+  saveBox: (box) => ipcRenderer.send('save-box', box),
+  removeBox: (id) => ipcRenderer.send('remove-box', id),
+  boxSettings: (id) => ipcRenderer.send('box-settings', id),
+  getSpritePacks: () => ipcRenderer.invoke('sprite-packs'),
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  getDisplays: () => ipcRenderer.invoke('get-displays'),
+  getFortune: () => ipcRenderer.invoke('fortune'),
+  isDebug: () => ipcRenderer.invoke('is-debug'),
+  debugReport: (report) => ipcRenderer.send('debug-report', report),
+});

@@ -1,0 +1,6 @@
+# release zips and unpacked runnable builds live in builds/, outside git
+/builds/
+node_modules/
+tools/*.exe
+# local planning notes (superpowers specs and plans), not part of floof
+/docs/superpowers/

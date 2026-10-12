@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file: data:; style-src 'self'" />
+    <title>floof settings</title>
+    <link rel="stylesheet" href="settings.css" />
+  </head>
+  <body>
+    <header>
+      <img src="../assets/icon.png" alt="" />
+      <div>
+        <h1>floof</h1>
+        <p class="muted">Desktop pets for your AI agents <span id="version"></span></p>
+      </div>
+    </header>
+
+    <main>
+    <section>
+      <h2>Pets</h2>
+      <label class="row"><span>Critter size</span><input id="scale" type="range" min="2" max="5" step="1" /></label>
+      <label class="check"><input id="wildCritters" type="checkbox" /> Show free-roaming critters when no agent is running</label>
+      <label class="check"><input id="walkOnWindows" type="checkbox" /> Let pets climb and walk on top of open windows</label>
+      <p><strong>Screens pets can use</strong></p>
+      <ul id="screens" class="screens"></ul>
+      <div class="buttons"><button id="identify">Identify screens</button> <span id="screensNote" class="muted"></span></div>
+      <label class="check"><input id="curtain" type="checkbox" /> When an agent needs me and its pet is out of sight, the pet pulls my window open like a curtain</label>
+      <label class="row"><span>Close balloons after</span><span class="inline"><input id="balloonSeconds" type="number" min="0" max="3600" /> seconds, unless pinned with "Keep open" (0 = never)</span></label>
+      <label class="row"><span>Stop asking after</span><span class="inline"><input id="askTimeout" type="number" min="0" max="1440" /> minutes (0 = keep asking)</span></label>
+      <p class="muted">A pet you can see asks in its own balloon. If you don't answer in time, the pet puts the question away and wanders again; click it to see the question.</p>
+      <label class="row"
+        ><span>Agents wear</span
+        ><span class="inline"
+          ><select id="providerWear">
+            <option value="cap">a cap</option>
+            <option value="tshirt">a T-shirt</option>
+            <option value="both">a cap and a T-shirt</option>
+            <option value="none">nothing</option>
+          </select>
+          in their provider's colour, with its initial (Claude, Gemini, Codex…). Birds wear a scarf instead of a T-shirt.</span
+        ></label
+      >
+      <label class="row"
+        ><span>Letter for OpenAI-compatible agents</span
+        ><span class="inline"><input id="compatLetter" type="text" maxlength="2" size="3" /> (Ollama agents are llamas wearing their model's initial; set a letter for one agent from the pet list)</span></label
+      >
+      <label class="check"><input id="fortunes" type="checkbox" /> Now and then, idle pets tell my fortune when I click them</label>
+      <label class="check"><input id="squishy" type="checkbox" /> Squishy landings: pets squash and wobble when they land from a fall</label>
+      <label class="check"
+        ><input id="interactOn" data-custom="1" type="checkbox" /> Hold
+        <select id="interactCombo">
+          <option value="ctrl+alt">Ctrl+Alt</option>
+          <option value="ctrl+shift">Ctrl+Shift</option>
+          <option value="alt+shift">Alt+Shift</option>
+          <option value="ctrl+win">Ctrl+Win</option>
+        </select>
+        to click or drag pets</label
+      >
+      <p class="muted">Without those keys, pets move out of the way of your mouse and of where you're typing, and clicks go straight through to your windows. A question waiting for your answer can always be clicked.</p>
+      <label class="check"><input id="idleSleep" type="checkbox" /> Idle pets sleep until I click them (only busy agents and ones waiting for me move about)</label>
+      <label class="check"><input id="minis" type="checkbox" /> Show agents' subagents as small pets that follow them</label>
+      <p><strong>Where pets live</strong></p>
+      <label class="check"><input type="radio" name="roam" value="everywhere" /> Everywhere: on the taskbar and on top of open windows</label>
+      <label class="check"><input type="radio" name="roam" value="apps" /> Only on the windows of the apps I tick below</label>
+      <div id="homeAppsPart">
+        <ul id="homeApps"></ul>
+        <div class="buttons">
+          <label class="inline">app <input id="newHomeApp" type="text" placeholder="for example Code" /></label>
+          <button id="addHomeApp">Add</button>
+        </div>
+        <div class="picker" id="homePicker"></div>
+      </div>
+      <label class="check"><input type="radio" name="roam" value="boxes" /> Inside pet boxes on my screen</label>
+      <div id="boxesPart">
+        <div class="buttons">
+          <button id="addBox">Add a pet box</button>
+          <span id="boxCount" class="muted"></span>
+        </div>
+        <p class="muted">On a box: ✎ arranges its shelves (+ shelf adds one; drag a shelf to move it, its ends to resize it, × removes it; ✎ again or Esc when done), ⚙ opens its settings here.</p>
+        <div id="boxList"></div>
+      </div>
+      <div class="buttons">
+        <button id="startTour">Show the tour again</button>
+        <span class="muted">The guide sheep walks you through floof's features.</span>
+      </div>
+      <div class="buttons">
+        <span class="muted">Try it:</span>
+        <button data-test="working">Working</button>
+        <button data-test="question">Question</button>
+        <button data-test="error">Error</button>
+        <button data-test="done">Done</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Keep pets off</h2>
+      <p class="muted">Pets never walk into, climb or cover these apps. When one of them is in front, a pet with a question pops up next to the clock instead.</p>
+      <label class="check"><input id="keepOffFullscreen" type="checkbox" /> Full-screen windows (games, videos, presentations)</label>
+      <ul id="apps"></ul>
+      <div class="buttons">
+        <label class="inline">app <input id="newApp" type="text" placeholder="for example Teams" /></label>
+        <button id="addApp">Add</button>
+      </div>
+      <div class="picker" id="keepOffPicker"></div>
+    </section>
+
+    <section>
+      <h2>Notifications</h2>
+      <label class="check"><input id="notify.questions" type="checkbox" /> When an agent asks something</label>
+      <label class="check"><input id="notify.errors" type="checkbox" /> When an agent hits a problem</label>
+      <label class="check"><input id="notify.done" type="checkbox" /> When an agent finishes</label>
+    </section>
+
+    <section>
+      <h2>Your sprites</h2>
+      <p class="muted">Add your own critters. A PNG strip is one row of frames side by side; floof uses it as the walk animation.</p>
+      <div class="buttons">
+        <button id="importStrip">Add a PNG strip…</button>
+        <label class="inline">frames <input id="frames" type="number" min="1" max="32" value="4" /></label>
+        <label class="inline">name <input id="packName" type="text" placeholder="optional" /></label>
+      </div>
+      <div class="buttons">
+        <button id="importFolder">Add a sprite pack folder…</button>
+        <button id="openFolder" class="link">Open my sprites folder</button>
+      </div>
+      <p id="packMsg" class="muted"></p>
+      <ul id="packs"></ul>
+    </section>
+
+    <section>
+      <h2>Agents on this PC</h2>
+      <label class="row"><span>Port</span><input id="port" type="number" min="1024" max="65535" /></label>
+      <p class="muted">Agents send events to <code id="localUrl"></code>. See the README for Claude Code, Codex, Gemini and any other command.</p>
+    </section>
+
+    <section>
+      <h2>Claude Code</h2>
+      <p class="muted">Give every Claude Code session on this PC its own pet. Connecting adds floof's hook to <code id="claudeFile"></code> and keeps everything else in it; the first time, a backup is saved next to it as settings.json.bak-floof. New Claude Code sessions get a pet.</p>
+      <label class="check"><input id="claudeSteps" data-custom="1" type="checkbox" /> Step-by-step updates and live control: the balloon shows each step, and a message or Stop you send reaches Claude at its next step (adds about 0.07 s to every Claude Code tool call). Without it, the pet just shows it's busy, and messages wait until Claude is done.</label>
+      <div class="buttons">
+        <button id="claudeConnect">Connect Claude Code</button>
+        <span id="claudeState" class="muted"></span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Cloud agents</h2>
+      <label class="check"><input id="relay.enabled" type="checkbox" /> Receive events from agents running in the cloud</label>
+      <label class="row"><span>Relay server</span><input id="relay.server" type="text" /></label>
+      <p class="muted">Cloud agents post their events to this private topic. Anyone who knows the topic name can talk to your pets, so keep it secret.</p>
+      <p>Status: <b id="relayState"></b> <span id="relayWhy" class="muted"></span></p>
+      <p id="relayIgnored" class="muted"></p>
+      <pre id="relayUrl"></pre>
+      <div class="buttons">
+        <button id="copyRelay">Copy address</button>
+        <button id="testRelay">Send test event</button>
+        <button id="newTopic" class="link">Make a new secret topic</button>
+        <span id="relayTestNote" class="muted"></span>
+      </div>
+      <p class="muted">
+        Claude Code on the web: add this hook to the repository's <code>.claude/settings.json</code> (for every event you want, like
+        the Claude Code hooks above), and allow <code>ntfy.sh</code> in the cloud environment's network access.
+      </p>
+      <pre id="relayHook"></pre>
+      <div class="buttons"><button id="copyHook">Copy hook command</button></div>
+    </section>
+
+    <section>
+      <h2>Startup</h2>
+      <label class="check"><input id="startAtLogin" type="checkbox" /> Start floof when I sign in to Windows</label>
+    </section>
+    </main>
+
+    <script src="ui.js"></script>
+  </body>
+</html>

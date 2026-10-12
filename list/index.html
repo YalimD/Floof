@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' file: data:; style-src 'self'" />
+    <title>floof pet list</title>
+    <link rel="stylesheet" href="../settings/settings.css" />
+    <link rel="stylesheet" href="list.css" />
+  </head>
+  <body>
+    <header>
+      <img src="../assets/icon.png" alt="" />
+      <div>
+        <h1>Pet list</h1>
+        <p class="muted">Click a row to make that pet hop and flash.</p>
+      </div>
+    </header>
+
+    <section>
+      <h2>Agents on screen</h2>
+      <ul id="agents" class="rows"></ul>
+      <p id="noAgents" class="muted">No agents right now.</p>
+    </section>
+
+    <section>
+      <h2>Free critters</h2>
+      <ul id="critters" class="rows small"></ul>
+      <p id="noCritters" class="muted">None out.</p>
+      <div class="buttons"><button id="removeCritters" class="link">Remove all free critters</button></div>
+    </section>
+
+    <section>
+      <h2>Finished</h2>
+      <p class="muted">Agents whose session ended or that left the screen. Kept for 30 days, up to 200.</p>
+      <ul id="finished" class="rows"></ul>
+      <p id="noFinished" class="muted">Nothing yet.</p>
+      <div class="buttons"><button id="clear" class="link">Clear list</button></div>
+    </section>
+
+    <script src="../renderer/critters.js"></script>
+    <script src="../renderer/minis.js"></script>
+    <script src="ui.js"></script>
+  </body>
+</html>

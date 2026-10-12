@@ -1,0 +1,124 @@
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rows li {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  gap: 2px 10px;
+  align-items: start;
+  padding: 7px 4px;
+  border-top: 1px solid var(--line);
+  cursor: pointer;
+}
+.rows li:first-child {
+  border-top: none;
+}
+.rows li:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.rows.small li {
+  grid-template-columns: 34px 1fr auto;
+  padding: 4px;
+}
+/* an agent's subagents, under its row */
+.rows li.sub {
+  padding: 3px 4px 3px 30px;
+  border-top: none;
+  font-size: 12px;
+}
+.rows li.sub .face {
+  font-size: 15px;
+}
+.rows.done li {
+  cursor: default;
+}
+.face {
+  position: relative;
+  font-size: 22px;
+  line-height: 1;
+  text-align: center;
+}
+.cap {
+  position: absolute;
+  right: -2px;
+  top: -4px;
+  min-width: 13px;
+  padding: 0 2px;
+  border-radius: 4px 4px 2px 2px;
+  font: bold 9px/12px 'Segoe UI', sans-serif;
+  text-align: center;
+}
+.who {
+  font-weight: 600;
+}
+.who small {
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 4px;
+}
+.text {
+  grid-column: 2 / 4;
+  color: var(--muted);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+.state {
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: right;
+}
+.state b {
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: var(--line);
+  font-weight: 600;
+}
+.state.question b {
+  background: #ffd76b;
+  color: #222;
+}
+.state.working b {
+  background: #cdeccd;
+  color: #222;
+}
+.state.error b {
+  background: #f6c6c6;
+  color: #222;
+}
+.state .muted {
+  display: block;
+}
+.letter {
+  grid-column: 2 / 4;
+  font-size: 12px;
+}
+.letter input,
+.ask input {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.letter input {
+  width: 2.4em;
+  text-align: center;
+}
+.ask {
+  grid-column: 2 / 4;
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.ask input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* a row's remove or dismiss button */
+.rows .remove {
+  margin-left: 8px;
+  font-size: 12px;
+}

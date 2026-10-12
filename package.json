@@ -1,0 +1,20 @@
+{
+  "name": "floof",
+  "productName": "floof",
+  "version": "0.22.0",
+  "description": "Desktop pets for your AI agents: fluffy cats, dogs, birds and sheep that walk on your Windows desktop and show what your agents are doing.",
+  "main": "main.js",
+  "scripts": {
+    "start": "node run-dev.js",
+    "demo": "node run-dev.js --demo",
+    "bench": "node run-dev.js --bench",
+    "hook": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-hook.ps1",
+    "postinstall": "npm run hook",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "author": "Yalım",
+  "license": "Unlicense",
+  "devDependencies": {
+    "electron": "33.4.11"
+  }
+}

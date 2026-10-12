@@ -1,0 +1,666 @@
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  user-select: none;
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+}
+
+.pet {
+  position: absolute;
+  left: 0;
+  top: 0;
+  cursor: grab;
+  will-change: transform;
+}
+.pet.dragging {
+  cursor: grabbing;
+}
+.pet canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+/* found from the pet list: flash so you can spot it */
+.pet.flash canvas {
+  animation: flash 0.4s ease-in-out 6 alternate;
+}
+@keyframes flash {
+  to {
+    filter: drop-shadow(0 0 6px #ffd76b) drop-shadow(0 0 10px #ff9f1c) brightness(1.3);
+  }
+}
+/* the interact keys are held: pets glow a little to show they can be clicked and dragged */
+body.interact .pet canvas {
+  filter: drop-shadow(0 0 4px rgba(255, 200, 60, 0.95));
+}
+
+/* a hard landing kicks up a few pixels of dust */
+.dust {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(170, 158, 136, 0.9);
+  pointer-events: none;
+  animation: dust 0.45s ease-out forwards;
+}
+@keyframes dust {
+  to {
+    transform: translate(var(--dx), -7px);
+    opacity: 0;
+  }
+}
+
+/* dizzy after a big drop: stars going round over the head (an ellipse from two sliding axes) */
+.pet .dizzy {
+  position: absolute;
+  left: 50%;
+  top: -2px;
+  display: none;
+  pointer-events: none;
+}
+.pet .dizzy.on {
+  display: block;
+}
+.pet .dizzy span,
+.pet .dizzy i {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.pet .dizzy span {
+  animation: dizzy-x 0.45s ease-in-out infinite alternate;
+}
+.pet .dizzy i {
+  margin: -6px 0 0 -4px;
+  font-size: 10px;
+  font-style: normal;
+  line-height: 1;
+  color: #ffd23f;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  animation: dizzy-y 0.45s ease-in-out infinite alternate;
+  animation-delay: -0.225s;
+}
+.pet .dizzy span:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.pet .dizzy span:nth-child(2) i {
+  animation-delay: -0.525s;
+}
+.pet .dizzy span:nth-child(3) {
+  animation-delay: -0.6s;
+}
+.pet .dizzy span:nth-child(3) i {
+  animation-delay: -0.825s;
+}
+@keyframes dizzy-x {
+  from {
+    transform: translateX(-13px);
+  }
+  to {
+    transform: translateX(13px);
+  }
+}
+@keyframes dizzy-y {
+  from {
+    transform: translateY(-4px);
+  }
+  to {
+    transform: translateY(4px);
+  }
+}
+
+/* status icon floating over the head */
+.pet .badge {
+  position: absolute;
+  left: 50%;
+  top: -18px;
+  transform: translateX(-50%);
+  font-size: 18px;
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
+.pet .badge.bounce {
+  animation: bounce 0.6s ease-in-out infinite alternate;
+}
+@keyframes bounce {
+  to {
+    transform: translate(-50%, -6px);
+  }
+}
+
+/* name tag, only on hover */
+.pet .tag {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(20, 20, 28, 0.8);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.pet:hover .tag {
+  opacity: 1;
+}
+
+/* thin progress bar under the pet */
+.pet .bar {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: -6px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  display: none;
+}
+.pet .bar > div {
+  height: 100%;
+  background: #6bd36b;
+  width: 0;
+  transition: width 0.4s;
+}
+
+/* pet boxes: little homes the pets live in (Settings > Pets > Where pets live) */
+.petbox {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  border: 2px solid rgba(34, 34, 34, 0.55);
+  border-radius: 14px;
+  background: rgba(255, 253, 246, 0.18);
+  pointer-events: none; /* clicks go through, except on the title bar and the resize corner */
+}
+.petbox-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px 0 10px;
+  border-radius: 12px 12px 0 0;
+  background: rgba(255, 253, 246, 0.85);
+  border-bottom: 1px solid rgba(34, 34, 34, 0.3);
+  color: #444;
+  font-size: 11px;
+  cursor: move;
+  pointer-events: auto;
+}
+.petbox-close {
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 15px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+}
+.petbox-grip {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 0 0 12px 0;
+  background: linear-gradient(135deg, transparent 50%, rgba(34, 34, 34, 0.55) 50%);
+  cursor: nwse-resize;
+  pointer-events: auto;
+}
+
+.petbox-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background-position: center;
+  pointer-events: none;
+}
+.petbox-tools button {
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 3px;
+}
+.petbox-add,
+.petbox-shelf .del,
+.petbox-shelf .end {
+  display: none;
+}
+.petbox.editing {
+  pointer-events: auto;
+}
+.petbox.editing .petbox-add,
+.petbox.editing .petbox-shelf .del {
+  display: inline-block;
+}
+.petbox-shelf {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--shelf, #a8743f);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+.petbox.editing .petbox-shelf {
+  pointer-events: auto;
+  outline: 1px dashed #222;
+  outline-offset: 2px;
+  cursor: move;
+}
+.petbox.editing .petbox-shelf .end {
+  display: block;
+  position: absolute;
+  top: -5px;
+  width: 8px;
+  height: 16px;
+  border-radius: 3px;
+  background: #222;
+  cursor: ew-resize;
+}
+.petbox-shelf .end.left {
+  left: -5px;
+}
+.petbox-shelf .end.right {
+  right: -5px;
+}
+.petbox-shelf .del {
+  position: absolute;
+  left: 50%;
+  top: -20px;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid #222;
+  border-radius: 50%;
+  background: #fffdf6;
+  color: #222;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: pointer;
+}
+.petbox.editing .petbox-edit {
+  border-radius: 6px;
+  background: #ffd76b;
+  color: #222;
+}
+.petbox.editing {
+  outline: 2px dashed rgba(34, 34, 34, 0.55);
+  outline-offset: 3px;
+}
+
+/* talking balloons */
+.balloon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 260px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #fffdf6;
+  color: #222;
+  border: 2px solid #222;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  line-height: 1.35;
+  display: none;
+  user-select: text;
+}
+.balloon.open {
+  display: block;
+}
+.balloon::after {
+  content: '';
+  position: absolute;
+  left: var(--tail, 50%);
+  bottom: -10px;
+  width: 14px;
+  height: 14px;
+  background: #fffdf6;
+  border-right: 2px solid #222;
+  border-bottom: 2px solid #222;
+  transform: translateX(-50%) rotate(45deg);
+}
+.balloon .pin {
+  float: right;
+  margin: -2px -4px 0 6px;
+  padding: 1px 6px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  background: transparent;
+  color: #666;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.balloon .pin.on {
+  border-color: #222;
+  background: #ffd76b;
+  color: #222;
+}
+.balloon .who {
+  font-weight: 700;
+}
+.balloon .who small {
+  font-weight: 400;
+  color: #777;
+  margin-left: 4px;
+}
+.balloon .who .subs {
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 8px;
+  background: #eee;
+  font-weight: 400;
+  font-size: 0.85em;
+  cursor: default;
+}
+.balloon .now {
+  margin: 6px 0;
+}
+.balloon .fortune {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: #f4efe0;
+  color: #444;
+  font-style: italic;
+}
+.balloon .progress {
+  height: 6px;
+  border-radius: 3px;
+  background: #eee;
+  overflow: hidden;
+  margin: 4px 0 6px;
+}
+.balloon .progress > div {
+  height: 100%;
+  background: #6bd36b;
+}
+.balloon .log {
+  margin: 0;
+  padding: 6px 0 0;
+  list-style: none;
+  border-top: 1px dashed #ccc;
+  color: #666;
+  font-size: 11.5px;
+  max-height: 110px;
+  overflow-y: auto;
+}
+.balloon .ask {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+.balloon .ask input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  font: inherit;
+}
+.balloon .ask button {
+  padding: 4px 10px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  background: #ffd76b;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* a message or Stop for the agent */
+.balloon .cmd {
+  display: none;
+  gap: 6px;
+  margin-top: 8px;
+}
+.balloon .cmd input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  font: inherit;
+}
+.balloon .cmd button {
+  padding: 4px 9px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  background: #ffd76b;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.balloon .cmd .stop {
+  background: #fff;
+}
+.balloon .cmd .stop.armed {
+  background: #e5484d;
+  color: #fff;
+}
+.balloon .goto {
+  margin-top: 6px;
+  padding: 3px 9px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.balloon .dismiss {
+  margin: 6px 0 0 4px;
+  padding: 3px 4px;
+  border: none;
+  background: none;
+  color: #666;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.balloon .dismiss:hover {
+  color: #d8323a;
+}
+.balloon .cmdnote {
+  display: none;
+  margin-top: 4px;
+  color: #666;
+  font-size: 11.5px;
+}
+
+/* the guide sheep's tour buttons */
+.balloon .tourbar {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.balloon .tourbar button {
+  padding: 4px 10px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  background: #ffd76b;
+  font: inherit;
+  cursor: pointer;
+}
+.balloon .tourbar button.link {
+  border-color: transparent;
+  background: transparent;
+  color: #666;
+}
+
+/* small chatter bubble when two pets meet */
+.chatter {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1.5px solid #222;
+  font-size: 14px;
+  white-space: nowrap;
+  pointer-events: none;
+  display: none;
+}
+.chatter.open {
+  display: block;
+}
+
+/* the curtain: a pet pulls a window corner open to show what its agent needs */
+.curtain {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 300px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+.curtain.show {
+  opacity: 1;
+}
+.curtain .note {
+  padding: 14px 16px 12px;
+  border-radius: 12px;
+  background: #fffdf6;
+  color: #222;
+  border: 2px solid #222;
+  font-size: 13.5px;
+  line-height: 1.4;
+  user-select: text;
+}
+.curtain .who {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.curtain.corner-bl .note {
+  padding-left: 36px; /* room for the gathered drape */
+}
+.curtain.corner-tr .who {
+  padding-right: 40px; /* room for the gathered drape */
+}
+.curtain .text {
+  margin-bottom: 10px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.curtain .ask {
+  display: flex;
+  gap: 6px;
+}
+.curtain .ask input {
+  flex: 1;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  font: inherit;
+}
+.curtain button {
+  padding: 5px 10px;
+  border: 1.5px solid #222;
+  border-radius: 8px;
+  background: #ffd76b;
+  font: inherit;
+  cursor: pointer;
+}
+.curtain .later {
+  margin-top: 8px;
+  background: transparent;
+  border-color: transparent;
+  color: #666;
+  padding: 2px 0;
+}
+
+/* velvet drape: covers the note, then gathers into the corner the pet is pulling */
+.curtain .drape {
+  position: absolute;
+  inset: -4px;
+  border-radius: 12px;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.25), transparent 18%),
+    repeating-linear-gradient(90deg, #8e1b2e 0 10px, #b52a42 10px 18px, #d1435b 18px 22px, #a3233a 22px 30px);
+  transition: clip-path 0.9s cubic-bezier(0.6, 0, 0.25, 1);
+  pointer-events: none;
+}
+.curtain.corner-tr .drape {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+.curtain.corner-tr.open .drape {
+  clip-path: polygon(78% 0, 100% 0, 100% 42%, 97% 22%);
+}
+.curtain.corner-bl .drape {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+.curtain.corner-bl.open .drape {
+  clip-path: polygon(0 50%, 4% 76%, 24% 100%, 0 100%);
+}
+/* gold tie-back where the drape is gathered */
+.curtain .tie {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe9a1, #c99a1c);
+  border: 1.5px solid #6b4e00;
+  opacity: 0;
+  transition: opacity 0.3s 0.7s;
+}
+.curtain.open .tie {
+  opacity: 1;
+}
+.curtain.corner-tr .tie {
+  right: 10%;
+  top: 14%;
+}
+.curtain.corner-bl .tie {
+  left: 8%;
+  bottom: 12%;
+}
+
+/* minis: an agent's subagents, following its pet */
+.mini {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 0.3s;
+}
+.mini canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+.mini .badge {
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+}
